@@ -1,0 +1,231 @@
+
+<!DOCTYPE html>
+
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"/>
+<title>CONECTANDO-SE COM NOSSOS VALORES</title>
+<style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: white;
+            color: #333;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+        h1 {
+            color: #004080;
+        }
+        .question {
+            display: none;
+            margin-top: 30px;
+        }
+        .question.active {
+            display: block;
+        }
+        .options button {
+            display: block;
+            width: 100%;
+            margin: 10px 0;
+            padding: 12px;
+            font-size: 16px;
+            cursor: pointer;
+            border: 2px solid #004080;
+            background-color: white;
+            color: #004080;
+            border-radius: 5px;
+        }
+        .options button.correct {
+            background-color: #006400;
+            color: white;
+            border: none;
+        }
+        .options button.incorrect {
+            background-color: #8B0000;
+            color: white;
+            border: none;
+        }
+        #start-screen, #result-screen {
+            margin-top: 50px;
+        }
+        #start-button {
+            background-color: #28a745;
+            color: white;
+            padding: 12px 24px;
+            font-size: 18px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        #name-input {
+            padding: 10px;
+            font-size: 16px;
+            width: 60%;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+<div id="start-screen">
+<h1>CONECTANDO-SE COM NOSSOS VALORES</h1>
+<p>Digite seu nome:</p>
+<input id="name-input" required="" type="text"/>
+<br/><br/>
+<button id="start-button">Iniciar Quiz</button>
+</div>
+<div id="quiz-container"></div>
+<div id="result-screen" style="display:none;">
+<h2>Parabéns, <span id="user-name"></span>!</h2>
+<p>Você concluiu o quiz.</p>
+<p>Sua pontuação: <span id="score"></span> de <span id="total"></span></p>
+</div>
+</div>
+<script>
+        const questions = [
+            {
+                question: "Qual dessas atitudes representa melhor o valor de Integridade?",
+                options: ["Cumprir prazos somente quando cobrado.", "Compartilhar senhas com colegas.", "Assumir um erro e comunicar ao líder imediatamente.", "Agir conforme a conveniência da situação."],
+                correct: 2
+            },
+            {
+                question: "Um colega está falando mal de outro pelas costas. O que fazer segundo nosso valor de Integridade?",
+                options: ["Fingir que não ouvi.", "Contar para os outros e rir da situação.", "Conversar com a pessoa ou orientar a procurar o colega diretamente.", "Ignorar e continuar o trabalho."],
+                correct: 2
+            },
+            {
+                question: "Qual frase melhor representa a Integridade no ambiente de trabalho?",
+                options: ["Fazer a coisa certa, mesmo quando ninguém está olhando.", "Ter um bom discurso, mesmo que a prática não acompanhe.", "Concordar com tudo para evitar conflitos.", "Ajudar apenas os amigos."],
+                correct: 0
+            },
+            {
+                question: "O que é agir com Transparência no dia a dia?",
+                options: ["Ser claro e coerente na comunicação e ações.", "Guardar informações para si.", "Dar informações vagas para evitar problemas.", "Compartilhar tudo, até fofocas."],
+                correct: 0
+            },
+            {
+                question: "Um cliente fez uma pergunta difícil e você não sabe responder. O que fazer com base na Transparência?",
+                options: ["Inventar uma resposta para não parecer despreparado.", "Admitir que não sabe e buscar a informação correta.", "Mudar de assunto.", "Pedir para o cliente procurar outra pessoa."],
+                correct: 1
+            },
+            {
+                question: "Qual dessas frases melhor expressa o valor da Transparência?",
+                options: ["Nossas ações confirmam nossas palavras.", "Falar bonito já basta.", "Segredos mantêm a ordem.", "Ficar em silêncio evita conflitos."],
+                correct: 0
+            },
+            {
+                question: "O que representa Empreendedorismo dentro da empresa?",
+                options: ["Criar um negócio próprio fora da empresa.", "Sugerir melhorias para o setor e ajudar a implementá-las.", "Fazer só o que foi pedido.", "Evitar mudanças."],
+                correct: 1
+            },
+            {
+                question: "Uma atitude empreendedora no trabalho é:",
+                options: ["Propor novas ideias mesmo sem ser solicitado.", "Esperar o líder identificar os problemas.", "Fazer só sua parte.", "Dizer “isso sempre foi feito assim”."],
+                correct: 0
+            },
+            {
+                question: "Qual dessas frases combina com nosso valor de Empreendedorismo?",
+                options: ["Esperamos ordens para agir.", "Mudanças são responsabilidade da liderança.", "Todos podem contribuir com ideias para melhorar.", "Meu trabalho começa e termina na minha função."],
+                correct: 2
+            }
+        ];
+
+        const startButton = document.getElementById("start-button");
+        const nameInput = document.getElementById("name-input");
+        const startScreen = document.getElementById("start-screen");
+        const quizContainer = document.getElementById("quiz-container");
+        const resultScreen = document.getElementById("result-screen");
+        const userNameSpan = document.getElementById("user-name");
+        const scoreSpan = document.getElementById("score");
+        const totalSpan = document.getElementById("total");
+
+        let currentQuestion = 0;
+        let score = 0;
+
+        startButton.addEventListener("click", () => {
+            const name = nameInput.value.trim();
+            if (name === "") {
+                alert("Por favor, digite seu nome para iniciar.");
+                return;
+            }
+            startScreen.style.display = "none";
+            userNameSpan.textContent = name;
+            showQuestion();
+        });
+
+        function showQuestion() {
+            quizContainer.innerHTML = "";
+            if (currentQuestion >= questions.length) {
+                resultScreen.style.display = "block";
+                scoreSpan.textContent = score;
+                totalSpan.textContent = questions.length;
+                return;
+            }
+
+            const q = questions[currentQuestion];
+            const questionDiv = document.createElement("div");
+            questionDiv.className = "question active";
+
+            const title = document.createElement("h2");
+            title.textContent = q.question;
+            questionDiv.appendChild(title);
+
+            const optionsDiv = document.createElement("div");
+            optionsDiv.className = "options";
+
+            q.options.forEach((opt, index) => {
+                const btn = document.createElement("button");
+                btn.textContent = opt;
+                btn.addEventListener("click", () => {
+                    const buttons = optionsDiv.querySelectorAll("button");
+                    buttons.forEach((b, i) => {
+                        b.disabled = true;
+                        if (i === q.correct) {
+                            b.classList.add("correct");
+                        }
+                    });
+                    if (index === q.correct) {
+                        score++;
+                    } else {
+                        btn.classList.add("incorrect");
+                    }
+                    setTimeout(() => {
+                        currentQuestion++;
+                        showQuestion();
+                    }, 1500);
+                });
+                optionsDiv.appendChild(btn);
+            });
+
+            questionDiv.appendChild(optionsDiv);
+            quizContainer.appendChild(questionDiv);
+        }
+    </script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const startButton = document.getElementById("startButton");
+  if (startButton) {
+    startButton.addEventListener("click", function () {
+      const nomeInput = document.getElementById("nome");
+      const nome = nomeInput ? nomeInput.value.trim() : "";
+      if (nome !== "") {
+        iniciarQuiz(nome);
+      } else {
+        alert("Por favor, digite seu nome para iniciar o quiz.");
+      }
+    });
+  }
+});
+
+function iniciarQuiz(nome) {
+  // Aqui você pode adicionar a lógica para exibir as perguntas do quiz
+  alert("Quiz iniciado para: " + nome);
+}
+</script></body>
+</html>
